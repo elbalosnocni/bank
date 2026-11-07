@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Khảo Sát & Thi Trắc Nghiệm Trực Tuyến</title>
+    <link href="https://jsdelivr.net" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; padding: 30px 0; }
+        .quiz-container { max-width: 760px; margin: auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .question-img { max-width: 100%; max-height: 250px; object-fit: contain; margin-bottom: 15px; border-radius: 6px; display: block;}
+        .timer-badge { position: fixed; top: 20px; right: 20px; font-size: 1.4rem; padding: 10px 20px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Đồng hồ đếm ngược nổi trên màn hình -->
+    <div id="timer-display" class="badge bg-danger timer-badge d-none">Thời gian: --:--</div>
+
+    <div class="quiz-container">
+        <!-- MÀN HÌNH ĐĂNG NHẬP / CHỌN MÔN THI -->
+        <div id="setup-screen">
+            <h3 class="text-center mb-4 fw-bold text-primary">CỔNG THI TRỰC TUYẾN</h3>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Họ và tên thí sinh:</label>
+                <input type="text" id="studentName" class="form-control form-control-lg" placeholder="Nhập chính xác họ và tên...">
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Chọn môn thi đang mở:</label>
+                <select id="monHoc" class="form-select form-select-lg">
+                    <option value="">-- Đang tải danh sách môn học... --</option>
+                </select>
+            </div>
+            <button class="btn btn-primary btn-lg w-100" onclick="startExam()">Bắt đầu làm bài</button>
+        </div>
+
+        <!-- MÀN HÌNH LÀM BÀI THI -->
+        <div id="exam-screen" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                <h4 id="exam-title" class="text-dark fw-bold m-0"></h4>
+                <span id="exam-mode" class="badge bg-secondary p-2"></span>
+            </div>
+            <div id="questions-area"></div>
+            <button class="btn btn-success btn-lg w-100 mt-4" onclick="submitExam(false)">Nộp bài thi</button>
+        </div>
+
+        <!-- MÀN HÌNH HIỂN THỊ KẾT QUẢ -->
+        <div id="result-screen" class="d-none text-center py-4">
+            <h3 class="text-success fw-bold mb-3">Nộp Bài Thành Công!</h3>
+            <div id="result-text" class="alert alert-success d-inline-block px-5"></div>
+            <p class="text-muted mt-2">Kết quả của bạn đã được ghi nhận tự động vào hệ thống quản lý.</p>
+            <button class="btn btn-outline-primary mt-3" onclick="location.reload()">Quay lại trang chủ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ĐIỀN ĐƯỜNG DẪN URL WEB APP GAS CỦA BẠN VÀO ĐÂY
+    const GAS_URL = "DÁN_URL_GAS_CỦA_BẠN_VÀO_ĐÂY"; 
+
+    let examQuestions = [];
+    let currentMonHoc = "";
+    let currentName = "";
+    let timerInterval = null;
+
+    // Tự động tải danh sách môn học hiện có từ cấu hình Sheets khi mở trang web
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch(`${GAS_URL}?action=getSubjects`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success") {
+                let select = document.getElementById('monHoc');
+                select.innerHTML = '<option value="">-- Chọn môn thi của bạn --</option>';
+                data.subjects.forEach(sub => {
+                    select.innerHTML += `<option value="${sub}">${sub}</option>`;
+                });
+            }
+        });
+    });
+
+    function startExam() {
+        currentName = document.getElementById('studentName').value.trim();
+        currentMonHoc = document.getElementById('monHoc').value;
+        
+        if(!currentName) return alert("Vui lòng điền họ và tên thí sinh!");
+        if(!currentMonHoc) return alert("Vui lòng lựa chọn môn thi!");
+
+        document.getElementById('questions-area').innerHTML = '<p class="text-center text-muted">Hệ thống đang chuẩn bị đề thi cá nhân hóa...</p>';
+        document.getElementById('setup-screen').classList.add('d-none');
+        document.getElementById('exam-screen').classList.remove('d-none');
+        document.getElementById('exam-title').innerText = currentMonHoc;
+
+        fetch(`${GAS_URL}?action=getExam&monHoc=${currentMonHoc}`)
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === "error") {
+                alert(res.message);
+                location.reload();
+                return;
+            }
+
+            examQuestions = res.questions;
+            setupTimer(parseInt(res.config.thoiGian));
+            
+            let html = '';
+            examQuestions.forEach((q, index) => {
+                let mediaHtml = q.image ? `<img src="${q.image}" class="question-img" alt="Hình ảnh câu hỏi">` : '';
+                
+                if (q.type === "FILL_BLANK") {
+                    html += `
+                        <div class="card mb-4 p-3 shadow-sm">
+                            <h5 class="fw-semibold">Câu ${index + 1}: ${q.question}</h5>
+                            ${mediaHtml}
+                            <div class="mt-2">
+                                <input type="text" class="form-control" name="q_${q.id}" placeholder="Nhập câu trả lời của bạn vào đây...">
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="card mb-4 p-3 shadow-sm">
+                            <h5 class="fw-semibold">Câu ${index + 1}: ${q.question}</h5>
+                            ${mediaHtml}
+                            <div class="form-check my-2"><input class="form-check-input" type="radio" name="q_${q.id}" value="A" id="q_${q.id}_a"> <label class="form-check-label" for="q_${q.id}_a"><strong>A.</strong> ${q.a}</label></div>
+                            <div class="form-check my-2"><input class="form-check-input" type="radio" name="q_${q.id}" value="B" id="q_${q.id}_b"> <label class="form-check-label" for="q_${q.id}_b"><strong>B.</strong> ${q.b}</label></div>
+                            <div class="form-check my-2"><input class="form-check-input" type="radio" name="q_${q.id}" value="C" id="q_${q.id}_c"> <label class="form-check-label" for="q_${q.id}_c"><strong>C.</strong> ${q.c}</label></div>
+                            <div class="form-check my-2"><input class="form-check-input" type="radio" name="q_${q.id}" value="D" id="q_${q.id}_d"> <label class="form-check-label" for="q_${q.id}_d"><strong>D.</strong> ${q.d}</label></div>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('questions-area').innerHTML = html;
+        });
+    }
+
+    function setupTimer(minutes) {
+        if (!minutes || minutes <= 0) {
+            document.getElementById('exam-mode').innerText = "Tự do thời gian";
+            return;
+        }
+        
+        document.getElementById('exam-mode').innerText = "Có bấm giờ";
+        let timeRemaining = minutes * 60;
+        const timerDisplay = document.getElementById('timer-display');
+        timerDisplay.classList.remove('d-none');
+
+        timerInterval = setInterval(() => {
+            let mins = Math.floor(timeRemaining / 60);
+            let secs = timeRemaining % 60;
+            timerDisplay.innerText = `Thời gian: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                alert("Đã hết thời gian làm bài! Hệ thống sẽ tự động nộp bài của bạn.");
+                submitExam(true);
+            }
+            timeRemaining--;
+        }, 1000);
+    }
+
+    function submitExam(isAutoSubmit = false) {
+        if (!isAutoSubmit && !confirm("Bạn có chắc chắn muốn nộp bài thi ngay bây giờ không?")) return;
+        if (timerInterval) clearInterval(timerInterval);
+        document.getElementById('timer-display').classList.add('d-none');
+
+        let answers = {};
+        examQuestions.forEach(q => {
+            if (q.type === "FILL_BLANK") {
+                let inputElement = document.querySelector(`input[name="q_${q.id}"]`);
+                answers[q.id] = inputElement ? inputElement.value.trim() : "";
+            } else {
+                let selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                answers[q.id] = selected ? selected.value : "";
+            }
+        });
+
+        document.getElementById('questions-area').innerHTML = '<p class="text-center text-muted">Hệ thống đang chấm điểm và lưu trữ kết quả...</p>';
+
+        fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "submitExam",
+                studentName: currentName,
+                monHoc: currentMonHoc,
+                answers: answers
+            })
+        })
+        .then(res => res.json())
+        .then(result => {
+            document.getElementById('exam-screen').classList.add('d-none');
+            document.getElementById('result-screen').classList.remove('d-none');
+            
+            let diem = ((result.score / result.total) * 10).toFixed(2);
+            document.getElementById('result-text').innerHTML = `
+                <span class="fs-4">Thí sinh: <strong>${currentName}</strong></span><br>
+                <span class="fs-5">Số câu trả lời đúng: <strong>${result.score} / ${result.total}</strong> câu</span><br>
+                <span class="fs-3 text-danger">Điểm số: <strong>${diem}</strong></span>
+            `;
+        });
+    }
+</script>
+</body>
+</html>
