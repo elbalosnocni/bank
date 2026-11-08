@@ -5,7 +5,7 @@
 
 // ID Google Sheets: lấy phần nằm giữa /d/ và /edit trong URL bảng tính.
 // Ví dụ URL: https://docs.google.com/spreadsheets/d/ABC123xyz/edit
-const SPREADSHEET_ID = "DAN_ID_GOOGLE_SHEET_CUA_BAN_VAO_DAY";
+const SPREADSHEET_ID = "1yTSRGL-chXp7AvWdMhY5naRBOqBd86-kbX25cBrVF-E";
 
 function getSpreadsheet_() {
   const id = String(SPREADSHEET_ID || "").trim();
