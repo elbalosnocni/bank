@@ -3,6 +3,22 @@
  * Chay setupSheets() mot lan de tao 3 trang tinh va tieu de.
  */
 
+// ID Google Sheets: lấy phần nằm giữa /d/ và /edit trong URL bảng tính.
+// Ví dụ URL: https://docs.google.com/spreadsheets/d/ABC123xyz/edit
+const SPREADSHEET_ID = "DAN_ID_GOOGLE_SHEET_CUA_BAN_VAO_DAY";
+
+function getSpreadsheet_() {
+  const id = String(SPREADSHEET_ID || "").trim();
+  if (!id || id === "DAN_ID_GOOGLE_SHEET_CUA_BAN_VAO_DAY") {
+    throw new Error("Chưa cấu hình SPREADSHEET_ID trong Code.gs. Hãy dán ID Google Sheets vào dòng cấu hình đầu file.");
+  }
+  try {
+    return SpreadsheetApp.openById(id);
+  } catch (err) {
+    throw new Error("Không mở được Google Sheets. Kiểm tra SPREADSHEET_ID và quyền truy cập của tài khoản triển khai. Chi tiết: " + err.message);
+  }
+}
+
 const SHEETS = {
   CONFIG: "CaiDatDeThi",
   BANK: "NganHangDe",
@@ -52,7 +68,7 @@ function doPost(e) {
 
 /** Tạo trang tính nếu thiếu; không xóa dữ liệu hiện có. */
 function setupSheets() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSpreadsheet_();
   Object.keys(HEADERS).forEach(name => {
     let sh = ss.getSheetByName(name);
     if (!sh) sh = ss.insertSheet(name);
@@ -199,7 +215,7 @@ function shuffle_(arr) {
   }
 }
 function getSheetOrThrow_(name) {
-  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
+  const sh = getSpreadsheet_().getSheetByName(name);
   if (!sh) throw new Error("Thiếu trang tính " + name + ". Hãy chạy setupSheets() trong Apps Script.");
   return sh;
 }
@@ -211,12 +227,7 @@ function jsonOutput_(obj) {
 /* ================= QUAN TRI ADMIN ================= */
 /** Chay thu cong mot lan trong Apps Script: setAdminPassword("mat-khau-manh-cua-ban") */
 function setAdminPassword(password) {
-  if (password == null || password === "") {
-    const ui = SpreadsheetApp.getUi();
-    const response = ui.prompt("Thiết lập mật khẩu Admin", "Nhập mật khẩu ít nhất 10 ký tự. Mật khẩu sẽ được băm và không lưu dạng rõ.", ui.ButtonSet.OK_CANCEL);
-    if (response.getSelectedButton() !== ui.Button.OK) return "Đã hủy thiết lập mật khẩu.";
-    password = response.getResponseText();
-  }
+  // Script độc lập không có giao diện bảng tính; truyền mật khẩu trực tiếp khi chạy hàm.
   password = String(password || "");
   if (password.length < 10) throw new Error("Mật khẩu Admin phải có ít nhất 10 ký tự.");
   const salt = Utilities.getUuid() + Utilities.getUuid();

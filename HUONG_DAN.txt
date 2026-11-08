@@ -1,4 +1,4 @@
-HỆ THỐNG THI TRỰC TUYẾN V3 - CÓ TRANG QUẢN TRỊ ADMIN
+HỆ THỐNG THI TRỰC TUYẾN V4 - DÙNG GOOGLE SHEET ID, CÓ TRANG QUẢN TRỊ ADMIN
 
 CÁC TỆP
 - Code.gs: API Google Apps Script, tạo đề, chấm điểm, xác thực Admin.
@@ -7,25 +7,28 @@ CÁC TỆP
 - Mau_NganHangDe.xlsx: File Excel mẫu 10 cột để nhập ngân hàng câu hỏi.
 
 A. CÀI ĐẶT GOOGLE SHEETS VÀ APPS SCRIPT
-1. Mở Google Sheets dùng làm cơ sở dữ liệu.
-2. Extensions (Tiện ích mở rộng) > Apps Script.
-3. Thay toàn bộ nội dung Code.gs bằng Code.gs trong gói này.
-4. Lưu dự án.
-5. Chạy setupSheets() một lần, cấp quyền. Hàm tạo/kiểm tra đúng 3 trang tính và không xóa dữ liệu đang có:
+1. Tạo hoặc mở Google Sheets dùng làm cơ sở dữ liệu.
+2. Sao chép ID của bảng tính: phần nằm giữa /d/ và /edit trong URL. Ví dụ: https://docs.google.com/spreadsheets/d/ABC123xyz/edit thì ID là ABC123xyz.
+3. Mở https://script.google.com/ và tạo dự án Apps Script độc lập (không cần gắn với Sheet), hoặc mở dự án Apps Script hiện có.
+4. Thay toàn bộ nội dung Code.gs bằng Code.gs trong gói này.
+5. Ở đầu Code.gs, tìm dòng const SPREADSHEET_ID và thay giá trị DAN_ID_GOOGLE_SHEET_CUA_BAN_VAO_DAY bằng ID vừa sao chép. Chỉ thay ID, giữ nguyên dấu ngoặc kép.
+6. Lưu dự án. Tài khoản chạy/deploy Apps Script phải có quyền chỉnh sửa Google Sheets đó.
+7. Chạy setupSheets() một lần và cấp quyền. Hàm tạo/kiểm tra đúng 3 trang tính và không xóa dữ liệu đang có:
    CaiDatDeThi: MonHoc | ThoiGianLamBai | NgayBatDau | NgayKetThuc | SoCauHoiBoc
    NganHangDe: Id | MonHoc | LoaiCauHoi | NoiDungCauHoi | HinhAnh | DapAnA | DapAnB | DapAnC | DapAnD | DapAnDung
    KetQua: ThoiGian | TenHocSinh | MonHoc | SoCauDung | TongSoCau | DiemSo
-6. Thiết lập mật khẩu Admin:
+8. Thiết lập mật khẩu Admin:
    - Chọn hàm setAdminPassword trong danh sách hàm Apps Script.
-   - Bấm Run. Một hộp thoại sẽ yêu cầu nhập mật khẩu (tối thiểu 10 ký tự).
+   - Trong Code.gs, thêm tạm hàm sau ở cuối file, thay mật khẩu mẫu bằng mật khẩu riêng (ít nhất 10 ký tự):
+     function taoMatKhauAdminMotLan() { setAdminPassword("MatKhauRieng_2026!"); }
+   - Chọn taoMatKhauAdminMotLan trong danh sách hàm và bấm Run. Sau khi chạy thành công, xóa hàm tạm này khỏi Code.gs và lưu lại.
    - Mật khẩu được băm với salt ngẫu nhiên và lưu trong Script Properties, không lưu dạng rõ trong HTML.
-   - Nếu hộp thoại không hiện, bảo đảm Apps Script được mở từ Google Sheets (script gắn với bảng tính).
-7. Deploy > New deployment > Web app:
+9. Deploy > New deployment > Web app:
    Execute as: Me
    Who has access: Anyone (hoặc giới hạn theo chính sách Google Workspace nếu phù hợp).
    Bấm Deploy và sao chép URL kết thúc bằng /exec.
-8. Dán cùng URL /exec vào dòng const GAS_URL trong CẢ HAI tệp index.html và admin.html.
-9. Deploy lại khi sửa Code.gs: Deploy > Manage deployments > Edit > New version > Deploy.
+10. Dán cùng URL /exec vào dòng const GAS_URL trong CẢ HAI tệp index.html và admin.html.
+11. Deploy lại khi sửa Code.gs: Deploy > Manage deployments > Edit > New version > Deploy.
 
 B. ĐƯA GIAO DIỆN LÊN GITHUB PAGES
 1. Upload index.html và admin.html lên cùng thư mục của repository GitHub Pages.
@@ -33,7 +36,7 @@ B. ĐƯA GIAO DIỆN LÊN GITHUB PAGES
 3. Giáo viên truy cập cùng tên miền + /admin.html để vào trang quản trị.
 
 C. SỬ DỤNG ADMIN
-- Đăng nhập bằng mật khẩu đã thiết lập ở bước A.6.
+- Đăng nhập bằng mật khẩu đã thiết lập ở bước A.8.
 - Môn thi & lịch thi: thêm hoặc cập nhật mã môn, số phút, ngày bắt đầu, ngày kết thúc, số câu hỏi bốc.
 - Ngân hàng câu hỏi: thêm câu hỏi trắc nghiệm hoặc điền khuyết. Câu trắc nghiệm yêu cầu đủ A/B/C/D và đáp án đúng là A/B/C/D.
 - Nhập câu hỏi Excel: copy 10 cột từ Excel, dán vào ô dữ liệu dạng tab-separated; có thể dán cả dòng tiêu đề. Id phải duy nhất.
