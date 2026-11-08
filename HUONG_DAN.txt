@@ -1,0 +1,56 @@
+HỆ THỐNG THI TRỰC TUYẾN V3 - CÓ TRANG QUẢN TRỊ ADMIN
+
+CÁC TỆP
+- Code.gs: API Google Apps Script, tạo đề, chấm điểm, xác thực Admin.
+- index.html: Cổng thi cho học sinh.
+- admin.html: Trang quản trị dành cho giáo viên/Admin.
+- Mau_NganHangDe.xlsx: File Excel mẫu 10 cột để nhập ngân hàng câu hỏi.
+
+A. CÀI ĐẶT GOOGLE SHEETS VÀ APPS SCRIPT
+1. Mở Google Sheets dùng làm cơ sở dữ liệu.
+2. Extensions (Tiện ích mở rộng) > Apps Script.
+3. Thay toàn bộ nội dung Code.gs bằng Code.gs trong gói này.
+4. Lưu dự án.
+5. Chạy setupSheets() một lần, cấp quyền. Hàm tạo/kiểm tra đúng 3 trang tính và không xóa dữ liệu đang có:
+   CaiDatDeThi: MonHoc | ThoiGianLamBai | NgayBatDau | NgayKetThuc | SoCauHoiBoc
+   NganHangDe: Id | MonHoc | LoaiCauHoi | NoiDungCauHoi | HinhAnh | DapAnA | DapAnB | DapAnC | DapAnD | DapAnDung
+   KetQua: ThoiGian | TenHocSinh | MonHoc | SoCauDung | TongSoCau | DiemSo
+6. Thiết lập mật khẩu Admin:
+   - Chọn hàm setAdminPassword trong danh sách hàm Apps Script.
+   - Bấm Run. Một hộp thoại sẽ yêu cầu nhập mật khẩu (tối thiểu 10 ký tự).
+   - Mật khẩu được băm với salt ngẫu nhiên và lưu trong Script Properties, không lưu dạng rõ trong HTML.
+   - Nếu hộp thoại không hiện, bảo đảm Apps Script được mở từ Google Sheets (script gắn với bảng tính).
+7. Deploy > New deployment > Web app:
+   Execute as: Me
+   Who has access: Anyone (hoặc giới hạn theo chính sách Google Workspace nếu phù hợp).
+   Bấm Deploy và sao chép URL kết thúc bằng /exec.
+8. Dán cùng URL /exec vào dòng const GAS_URL trong CẢ HAI tệp index.html và admin.html.
+9. Deploy lại khi sửa Code.gs: Deploy > Manage deployments > Edit > New version > Deploy.
+
+B. ĐƯA GIAO DIỆN LÊN GITHUB PAGES
+1. Upload index.html và admin.html lên cùng thư mục của repository GitHub Pages.
+2. Học sinh truy cập địa chỉ GitHub Pages của index.html.
+3. Giáo viên truy cập cùng tên miền + /admin.html để vào trang quản trị.
+
+C. SỬ DỤNG ADMIN
+- Đăng nhập bằng mật khẩu đã thiết lập ở bước A.6.
+- Môn thi & lịch thi: thêm hoặc cập nhật mã môn, số phút, ngày bắt đầu, ngày kết thúc, số câu hỏi bốc.
+- Ngân hàng câu hỏi: thêm câu hỏi trắc nghiệm hoặc điền khuyết. Câu trắc nghiệm yêu cầu đủ A/B/C/D và đáp án đúng là A/B/C/D.
+- Nhập câu hỏi Excel: copy 10 cột từ Excel, dán vào ô dữ liệu dạng tab-separated; có thể dán cả dòng tiêu đề. Id phải duy nhất.
+- Tổng quan: Mở / Đóng / Theo lịch cho từng môn. Mở sẽ cho phép vào thi ngay kể cả ngoài lịch cấu hình; Đóng khóa đề ngay. Theo lịch trả quyền kiểm soát cho NgayBatDau/NgayKetThuc.
+- Bảng điểm: lọc theo môn, hiển thị tối đa 1.000 kết quả gần nhất.
+
+D. QUY TẮC DỮ LIỆU
+- ThoiGianLamBai: 0 hoặc trống = không giới hạn.
+- NgayBatDau/NgayKetThuc: nhập trong trang quản trị theo giờ địa phương của bảng tính; để trống nếu không giới hạn đầu/cuối.
+- SoCauHoiBoc: số > 0 lấy ngẫu nhiên tối đa số câu đó; 0 = lấy tất cả câu hợp lệ.
+- LoaiCauHoi: MULTIPLE_CHOICE hoặc FILL_BLANK.
+- Điền khuyết: DapAnDung có thể chứa nhiều đáp án, cách nhau bằng dấu |. Chấm không phân biệt hoa thường, bỏ khoảng trắng thừa.
+- HinhAnh: URL ảnh công khai http/https. Ảnh không công khai sẽ không hiển thị cho học sinh.
+
+E. LƯU Ý BẢO MẬT / GIỚI HẠN
+- API Admin yêu cầu token phiên; mật khẩu không nằm trong HTML. Token hết hạn sau tối đa 6 giờ hoặc khi cache bị làm mới.
+- Không đưa cột DapAnDung ra giao diện học sinh; đáp án được giữ ở máy chủ để chấm.
+- Đây chưa phải hệ thống chống gian lận toàn diện: chưa xác minh danh tính, chưa giới hạn một lần thi theo từng học sinh, chưa có giám sát webcam/tab hay nhật ký IP.
+- Không chia sẻ URL Apps Script và mật khẩu Admin công khai. Nên dùng mật khẩu mạnh, không dùng lại mật khẩu cá nhân.
+- Nếu đổi quyền truy cập Web App hoặc tài khoản triển khai, cần kiểm tra lại khả năng gọi API từ GitHub Pages.

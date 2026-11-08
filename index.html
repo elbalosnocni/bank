@@ -1,204 +1,179 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Khảo Sát & Thi Trắc Nghiệm Trực Tuyến</title>
-    <link href="https://jsdelivr.net" rel="stylesheet">
-    <style>
-        body { background-color: #f4f6f9; padding: 30px 0; }
-        .quiz-container { max-width: 760px; margin: auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .question-img { max-width: 100%; max-height: 250px; object-fit: contain; margin-bottom: 15px; border-radius: 6px; display: block;}
-        .timer-badge { position: fixed; top: 20px; right: 20px; font-size: 1.4rem; padding: 10px 20px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cổng thi trực tuyến</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root{--primary:#2457c5}
+body{background:#f3f6fb;min-height:100vh;padding:28px 12px}
+.quiz-container{max-width:820px;margin:auto;background:#fff;padding:clamp(20px,4vw,40px);border-radius:18px;box-shadow:0 8px 32px rgba(20,40,80,.08)}
+.question-img{max-width:100%;max-height:300px;object-fit:contain;display:block;margin:14px auto;border-radius:8px}
+.timer-badge{position:sticky;top:10px;z-index:10;font-size:1.15rem}
+.question-card{border:1px solid #e5eaf2;border-radius:12px;padding:18px;margin-bottom:18px}
+.option{display:block;padding:10px 12px;border-radius:8px;cursor:pointer}
+.option:hover{background:#f2f6ff}
+#status{white-space:pre-line}
+</style>
 </head>
 <body>
-
 <div class="container">
-    <!-- Đồng hồ đếm ngược nổi trên màn hình -->
-    <div id="timer-display" class="badge bg-danger timer-badge d-none">Thời gian: --:--</div>
-
-    <div class="quiz-container">
-        <!-- MÀN HÌNH ĐĂNG NHẬP / CHỌN MÔN THI -->
-        <div id="setup-screen">
-            <h3 class="text-center mb-4 fw-bold text-primary">CỔNG THI TRỰC TUYẾN</h3>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Họ và tên thí sinh:</label>
-                <input type="text" id="studentName" class="form-control form-control-lg" placeholder="Nhập chính xác họ và tên...">
-            </div>
-            <div class="mb-4">
-                <label class="form-label fw-semibold">Chọn môn thi đang mở:</label>
-                <select id="monHoc" class="form-select form-select-lg">
-                    <option value="">-- Đang tải danh sách môn học... --</option>
-                </select>
-            </div>
-            <button class="btn btn-primary btn-lg w-100" onclick="startExam()">Bắt đầu làm bài</button>
-        </div>
-
-        <!-- MÀN HÌNH LÀM BÀI THI -->
-        <div id="exam-screen" class="d-none">
-            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                <h4 id="exam-title" class="text-dark fw-bold m-0"></h4>
-                <span id="exam-mode" class="badge bg-secondary p-2"></span>
-            </div>
-            <div id="questions-area"></div>
-            <button class="btn btn-success btn-lg w-100 mt-4" onclick="submitExam(false)">Nộp bài thi</button>
-        </div>
-
-        <!-- MÀN HÌNH HIỂN THỊ KẾT QUẢ -->
-        <div id="result-screen" class="d-none text-center py-4">
-            <h3 class="text-success fw-bold mb-3">Nộp Bài Thành Công!</h3>
-            <div id="result-text" class="alert alert-success d-inline-block px-5"></div>
-            <p class="text-muted mt-2">Kết quả của bạn đã được ghi nhận tự động vào hệ thống quản lý.</p>
-            <button class="btn btn-outline-primary mt-3" onclick="location.reload()">Quay lại trang chủ</button>
-        </div>
+  <div class="quiz-container">
+    <div id="setup-screen">
+      <h2 class="text-center fw-bold text-primary mb-4">CỔNG THI TRỰC TUYẾN</h2>
+      <div id="status" class="alert alert-info d-none"></div>
+      <div class="mb-3">
+        <label for="studentName" class="form-label fw-semibold">Họ và tên thí sinh</label>
+        <input id="studentName" class="form-control form-control-lg" maxlength="150" autocomplete="name" placeholder="Nhập họ và tên">
+      </div>
+      <div class="mb-4">
+        <label for="monHoc" class="form-label fw-semibold">Môn thi</label>
+        <select id="monHoc" class="form-select form-select-lg"><option value="">Đang tải danh sách môn thi...</option></select>
+      </div>
+      <button id="startBtn" class="btn btn-primary btn-lg w-100" onclick="startExam()">Bắt đầu làm bài</button>
     </div>
+
+    <div id="exam-screen" class="d-none">
+      <div class="d-flex justify-content-between align-items-center gap-3 border-bottom pb-3 mb-3">
+        <h4 id="exam-title" class="m-0 fw-bold"></h4>
+        <span id="exam-mode" class="badge text-bg-secondary p-2"></span>
+      </div>
+      <div id="timer-display" class="alert alert-danger text-center fw-bold timer-badge d-none"></div>
+      <div id="questions-area"></div>
+      <button id="submitBtn" class="btn btn-success btn-lg w-100 mt-3" onclick="submitExam(false)">Nộp bài thi</button>
+    </div>
+
+    <div id="result-screen" class="d-none text-center py-4">
+      <h2 class="text-success fw-bold mb-3">Nộp bài thành công!</h2>
+      <div id="result-text" class="alert alert-success"></div>
+      <p class="text-muted">Kết quả đã được ghi vào trang tính KetQua.</p>
+      <button class="btn btn-outline-primary mt-2" onclick="location.reload()">Quay lại trang chủ</button>
+    </div>
+  </div>
 </div>
-
 <script>
-    // ĐIỀN ĐƯỜNG DẪN URL WEB APP GAS CỦA BẠN VÀO ĐÂY
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyueTLu5pAa-5mR44qnXXeGWZR87Ix-RohlFdzgmZ6riPWK_pwFne4nEJc0FQ9t5hm8/exec"; 
+const GAS_URL = "DAN_URL_WEB_APP_GAS_CUA_BAN_VAO_DAY";
+let examQuestions=[], currentMonHoc="", currentName="", examToken="", timerInterval=null, submitting=false;
 
-    let examQuestions = [];
-    let currentMonHoc = "";
-    let currentName = "";
-    let timerInterval = null;
+document.addEventListener("DOMContentLoaded", loadSubjects);
 
-    // Tự động tải danh sách môn học hiện có từ cấu hình Sheets khi mở trang web
-    document.addEventListener("DOMContentLoaded", function() {
-        fetch(`${GAS_URL}?action=getSubjects`)
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === "success") {
-                let select = document.getElementById('monHoc');
-                select.innerHTML = '<option value="">-- Chọn môn thi của bạn --</option>';
-                data.subjects.forEach(sub => {
-                    select.innerHTML += `<option value="${sub}">${sub}</option>`;
-                });
-            }
-        });
+async function apiGet(params){
+  const url = new URL(GAS_URL);
+  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
+  const response = await fetch(url.toString());
+  if(!response.ok) throw new Error("Không kết nối được máy chủ ("+response.status+").");
+  return response.json();
+}
+async function apiPost(payload){
+  // text/plain tránh yêu cầu CORS preflight của application/json.
+  const response = await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+  if(!response.ok) throw new Error("Không gửi được bài thi ("+response.status+").");
+  return response.json();
+}
+function showStatus(message,type="info"){
+  const el=document.getElementById("status");
+  el.className="alert alert-"+type;
+  el.textContent=message;
+}
+async function loadSubjects(){
+  try{
+    const data=await apiGet({action:"getSubjects"});
+    const select=document.getElementById("monHoc");
+    select.innerHTML='<option value="">-- Chọn môn thi --</option>';
+    if(data.status!=="success") throw new Error(data.message||"Không tải được danh sách môn.");
+    data.subjects.forEach(subject=>{
+      const option=document.createElement("option");
+      option.value=subject; option.textContent=subject; select.appendChild(option);
     });
-
-    function startExam() {
-        currentName = document.getElementById('studentName').value.trim();
-        currentMonHoc = document.getElementById('monHoc').value;
-        
-        if(!currentName) return alert("Vui lòng điền họ và tên thí sinh!");
-        if(!currentMonHoc) return alert("Vui lòng lựa chọn môn thi!");
-
-        document.getElementById('questions-area').innerHTML = '<p class="text-center text-muted">Hệ thống đang chuẩn bị đề thi cá nhân hóa...</p>';
-        document.getElementById('setup-screen').classList.add('d-none');
-        document.getElementById('exam-screen').classList.remove('d-none');
-        document.getElementById('exam-title').innerText = currentMonHoc;
-
-        fetch(`${GAS_URL}?action=getExam&monHoc=${currentMonHoc}`)
-        .then(res => res.json())
-        .then(res => {
-            if (res.status === "error") {
-                alert(res.message);
-                location.reload();
-                return;
-            }
-
-            examQuestions = res.questions;
-            setupTimer(parseInt(res.config.thoiGian));
-            
-            let html = '';
-            examQuestions.forEach((q, index) => {
-                let mediaHtml = q.image ? `<img src="${q.image}" class="question-img" alt="Hình ảnh câu hỏi">` : '';
-                
-                if (q.type === "FILL_BLANK") {
-                    html += `
-                        <div class="card mb-4 p-3 shadow-sm">
-                            <h5 class="fw-semibold">Câu ${index + 1}: ${q.question}</h5>
-                            ${mediaHtml}
-                            <div class="mt-2">
-                                <input type="text" class="form-control" name="q_${q.id}" placeholder="Nhập câu trả lời của bạn vào đây...">
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="card mb-4 p-3 shadow-sm">
-                            <h5 class="fw-semibold">Câu ${index + 1}: ${q.question}</h5>
-                            ${mediaHtml}
-                            <div class="form-check my-2"><input class="form-check-input" type="radio" name="q_${q.id}" value="A" id="q_${q.id}_a"> <label class="form-check-label" for="q_${q.id}_a"><strong>A.</strong> ${q.a}</label></div>
-                            <div class="form-check my-2"><input class="form-check-input" type="radio" name="q_${q.id}" value="B" id="q_${q.id}_b"> <label class="form-check-label" for="q_${q.id}_b"><strong>B.</strong> ${q.b}</label></div>
-                            <div class="form-check my-2"><input class="form-check-input" type="radio" name="q_${q.id}" value="C" id="q_${q.id}_c"> <label class="form-check-label" for="q_${q.id}_c"><strong>C.</strong> ${q.c}</label></div>
-                            <div class="form-check my-2"><input class="form-check-input" type="radio" name="q_${q.id}" value="D" id="q_${q.id}_d"> <label class="form-check-label" for="q_${q.id}_d"><strong>D.</strong> ${q.d}</label></div>
-                        </div>
-                    `;
-                }
-            });
-            document.getElementById('questions-area').innerHTML = html;
-        });
+    if(!data.subjects.length) showStatus("Chưa có môn thi. Giáo viên hãy thêm môn vào trang CaiDatDeThi.","warning");
+  }catch(err){showStatus(err.message,"danger");}
+}
+async function startExam(){
+  currentName=document.getElementById("studentName").value.trim();
+  currentMonHoc=document.getElementById("monHoc").value;
+  if(!currentName){showStatus("Vui lòng nhập họ và tên thí sinh.","warning");return;}
+  if(!currentMonHoc){showStatus("Vui lòng chọn môn thi.","warning");return;}
+  const btn=document.getElementById("startBtn"); btn.disabled=true;
+  showStatus("Hệ thống đang tạo đề thi...");
+  try{
+    const res=await apiGet({action:"getExam",monHoc:currentMonHoc});
+    if(res.status!=="success") throw new Error(res.message||"Không thể tạo đề.");
+    examQuestions=res.questions||[]; examToken=res.token;
+    document.getElementById("setup-screen").classList.add("d-none");
+    document.getElementById("exam-screen").classList.remove("d-none");
+    document.getElementById("exam-title").textContent=currentMonHoc;
+    renderQuestions(); setupTimer(Number(res.config.thoiGian)||0);
+  }catch(err){showStatus(err.message,"danger");btn.disabled=false;}
+}
+function escapeHtml(value){
+  return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function renderQuestions(){
+  const area=document.getElementById("questions-area");
+  area.innerHTML="";
+  examQuestions.forEach((q,index)=>{
+    const card=document.createElement("section"); card.className="question-card";
+    const heading=document.createElement("h5"); heading.className="fw-semibold"; heading.textContent=`Câu ${index+1}: ${q.question}`; card.appendChild(heading);
+    if(q.image && /^https?:\/\//i.test(q.image)){
+      const img=document.createElement("img"); img.src=q.image; img.alt="Hình minh họa câu hỏi"; img.className="question-img"; img.loading="lazy"; card.appendChild(img);
     }
-
-    function setupTimer(minutes) {
-        if (!minutes || minutes <= 0) {
-            document.getElementById('exam-mode').innerText = "Tự do thời gian";
-            return;
-        }
-        
-        document.getElementById('exam-mode').innerText = "Có bấm giờ";
-        let timeRemaining = minutes * 60;
-        const timerDisplay = document.getElementById('timer-display');
-        timerDisplay.classList.remove('d-none');
-
-        timerInterval = setInterval(() => {
-            let mins = Math.floor(timeRemaining / 60);
-            let secs = timeRemaining % 60;
-            timerDisplay.innerText = `Thời gian: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            
-            if (timeRemaining <= 0) {
-                clearInterval(timerInterval);
-                alert("Đã hết thời gian làm bài! Hệ thống sẽ tự động nộp bài của bạn.");
-                submitExam(true);
-            }
-            timeRemaining--;
-        }, 1000);
+    if(q.type==="FILL_BLANK"){
+      const input=document.createElement("input"); input.type="text"; input.className="form-control"; input.name="q_"+q.id; input.placeholder="Nhập câu trả lời"; input.maxLength=500; card.appendChild(input);
+    }else{
+      [["A",q.a],["B",q.b],["C",q.c],["D",q.d]].forEach(([letter,value])=>{
+        const label=document.createElement("label"); label.className="option";
+        const radio=document.createElement("input"); radio.type="radio"; radio.name="q_"+q.id; radio.value=letter; radio.className="form-check-input me-2";
+        label.appendChild(radio); label.appendChild(document.createTextNode(letter+". "+value)); card.appendChild(label);
+      });
     }
-
-    function submitExam(isAutoSubmit = false) {
-        if (!isAutoSubmit && !confirm("Bạn có chắc chắn muốn nộp bài thi ngay bây giờ không?")) return;
-        if (timerInterval) clearInterval(timerInterval);
-        document.getElementById('timer-display').classList.add('d-none');
-
-        let answers = {};
-        examQuestions.forEach(q => {
-            if (q.type === "FILL_BLANK") {
-                let inputElement = document.querySelector(`input[name="q_${q.id}"]`);
-                answers[q.id] = inputElement ? inputElement.value.trim() : "";
-            } else {
-                let selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
-                answers[q.id] = selected ? selected.value : "";
-            }
-        });
-
-        document.getElementById('questions-area').innerHTML = '<p class="text-center text-muted">Hệ thống đang chấm điểm và lưu trữ kết quả...</p>';
-
-        fetch(GAS_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "submitExam",
-                studentName: currentName,
-                monHoc: currentMonHoc,
-                answers: answers
-            })
-        })
-        .then(res => res.json())
-        .then(result => {
-            document.getElementById('exam-screen').classList.add('d-none');
-            document.getElementById('result-screen').classList.remove('d-none');
-            
-            let diem = ((result.score / result.total) * 10).toFixed(2);
-            document.getElementById('result-text').innerHTML = `
-                <span class="fs-4">Thí sinh: <strong>${currentName}</strong></span><br>
-                <span class="fs-5">Số câu trả lời đúng: <strong>${result.score} / ${result.total}</strong> câu</span><br>
-                <span class="fs-3 text-danger">Điểm số: <strong>${diem}</strong></span>
-            `;
-        });
+    area.appendChild(card);
+  });
+}
+function setupTimer(minutes){
+  const mode=document.getElementById("exam-mode"), display=document.getElementById("timer-display");
+  if(minutes<=0){mode.textContent="Không giới hạn thời gian";return;}
+  mode.textContent="Có giới hạn thời gian";
+  display.classList.remove("d-none");
+  let remaining=minutes*60;
+  const tick=()=>{
+    const m=Math.floor(remaining/60),s=remaining%60;
+    display.textContent=`Thời gian còn lại: ${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    if(remaining<=0){clearInterval(timerInterval);submitExam(true);return;}
+    remaining--;
+  };
+  tick(); timerInterval=setInterval(tick,1000);
+}
+async function submitExam(autoSubmit=false){
+  if(submitting)return;
+  if(!autoSubmit&&!confirm("Bạn có chắc chắn muốn nộp bài thi?"))return;
+  submitting=true;
+  if(timerInterval)clearInterval(timerInterval);
+  document.getElementById("submitBtn").disabled=true;
+  document.getElementById("timer-display").classList.add("d-none");
+  const answers={};
+  examQuestions.forEach(q=>{
+    if(q.type==="FILL_BLANK"){
+      const input=document.querySelector(`[name="q_${CSS.escape(String(q.id))}"]`);
+      answers[q.id]=input?input.value.trim():"";
+    }else{
+      const selected=document.querySelector(`input[name="q_${CSS.escape(String(q.id))}"]:checked`);
+      answers[q.id]=selected?selected.value:"";
     }
+  });
+  document.getElementById("questions-area").textContent="Đang chấm điểm và lưu kết quả...";
+  try{
+    const result=await apiPost({action:"submitExam",token:examToken,studentName:currentName,answers});
+    if(result.status!=="success")throw new Error(result.message||"Không thể lưu bài thi.");
+    document.getElementById("exam-screen").classList.add("d-none");
+    document.getElementById("result-screen").classList.remove("d-none");
+    const grade=Number(result.diemSo != null ? result.diemSo : ((result.score / result.total * 10) || 0)).toFixed(2);
+    document.getElementById("result-text").textContent=`Thí sinh: ${currentName}\nSố câu đúng: ${result.score}/${result.total}\nĐiểm số: ${grade}/10`;
+  }catch(err){
+    submitting=false; document.getElementById("submitBtn").disabled=false;
+    document.getElementById("questions-area").textContent=err.message+" Vui lòng kiểm tra kết nối và thử nộp lại; không tải lại trang để tránh mất bài.";
+  }
+}
 </script>
 </body>
 </html>
