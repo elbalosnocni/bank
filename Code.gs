@@ -229,7 +229,7 @@ function jsonOutput_(obj) {
 function setAdminPassword(password) {
   // Script độc lập không có giao diện bảng tính; truyền mật khẩu trực tiếp khi chạy hàm.
   password = String(password || "");
-  if (password.length < 10) throw new Error("Mật khẩu Admin phải có ít nhất 10 ký tự.");
+  if (password.length < 6) throw new Error("Mật khẩu Admin phải có ít nhất 6 ký tự.");
   const salt = Utilities.getUuid() + Utilities.getUuid();
   const hash = hashPassword_(password, salt);
   PropertiesService.getScriptProperties().setProperties({ADMIN_SALT:salt, ADMIN_HASH:hash});
@@ -377,4 +377,7 @@ function formatDateTime_(value) {
   const d=value instanceof Date?value:new Date(value);
   if(isNaN(d.getTime())) return String(value);
   return Utilities.formatDate(d,Session.getScriptTimeZone(),"dd/MM/yyyy HH:mm");
+}
+function taoMatKhauAdminMotLan() {
+  setAdminPassword("Admin123");
 }
