@@ -1,5 +1,5 @@
 /** HE THONG THI/KHAO SAT V6 - Spreadsheet ID + danh ba nhan vien */
-const SPREADSHEET_ID = "DAN_ID_GOOGLE_SHEET_CUA_BAN_VAO_DAY";
+const SPREADSHEET_ID = "1yTSRGL-chXp7AvWdMhY5naRBOqBd86-kbX25cBrVF-E";
 function getSpreadsheet_(){const id=String(SPREADSHEET_ID||'').trim();if(!id||id.includes('DAN_ID_'))throw new Error('Chưa cấu hình SPREADSHEET_ID.');try{return SpreadsheetApp.openById(id)}catch(e){throw new Error('Không mở được Google Sheet. Kiểm tra ID và quyền truy cập: '+e.message)}}
 const SHEETS={CONFIG:'CaiDatDeThi',BANK:'NganHangDe',RESULTS:'KetQua',FEEDBACK:'PhanHoi',EMPLOYEES:'NhanVien'};
 const HEADERS={CaiDatDeThi:['MonHoc','ThoiGianLamBai','NgayBatDau','NgayKetThuc','SoCauHoiBoc','CheDo','XaoTronCauHoi','XaoTronDapAn'],NganHangDe:['Id','MonHoc','LoaiCauHoi','NoiDungCauHoi','HinhAnh','DapAnA','DapAnB','DapAnC','DapAnD','HinhAnhA','HinhAnhB','HinhAnhC','HinhAnhD','DapAnDung','PhanLoai','TruongTraLoi'],KetQua:['ThoiGian','TenHocSinh','MonHoc','SoCauDung','TongSoCau','DiemSo','MaNhanVien','BoPhan','PhongBan','ChucVu'],PhanHoi:['ThoiGian','TenNguoiTraLoi','MonHoc','CheDo','IdCauHoi','LoaiCauHoi','NoiDungCauHoi','NoiDungTraLoi','MaNhanVien','BoPhan','PhongBan','ChucVu','PhanLoai','TenTruong'],NhanVien:['MaNhanVien','HoTen','BoPhan','PhongBan','ChucVu','Email','TrangThai']};
