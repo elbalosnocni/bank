@@ -89,3 +89,16 @@ Luu y bao mat: day la he thong thi co xac thuc Admin co ban, chua phai nen tang 
    - Khi nhap Excel, cot 16 TruongTraLoi nhap cac muc cach nhau bang dau |.
 
    - Them dau * o dau dong trong cau hinh truong con neu muon bat buoc tra loi. Chon “Toi khong co y kien” se bo qua cac truong bat buoc.
+
+
+=== V7: XÁC THỰC CĂN CƯỚC VÀ PHÂN QUYỀN BÀI THI ===
+
+1. Chạy setupSheets() sau khi thay Code.gs V7. Sheet NhanVien được bổ sung cột H: CCCD_Hash (mã băm); sheet PhanQuyenDe được tạo mới. Không đổi tên cột H và không nhập số căn cước gốc trực tiếp vào cột H.
+2. Trong Admin > Danh sách nhân viên, dán 8 cột theo thứ tự: MaNhanVien, HoTen, BoPhan, PhongBan, ChucVu, Email, TrangThai, CCCD_12_SO. Cột cuối là số căn cước gốc 12 chữ số để hệ thống băm ngay khi nhận; số gốc không được ghi vào Google Sheet. Nếu cập nhật nhân viên mà để trống cột CCCD thì mã băm cũ được giữ nguyên.
+3. Hệ thống tạo bí mật CCCD_HMAC_SECRET trong Script Properties. Không xóa hoặc thay đổi thuộc tính này sau khi đã nhập nhân viên; nếu thay đổi, tất cả mã băm cũ không còn khớp và phải nhập lại danh sách có số căn cước.
+4. Người tham gia nhập căn cước trong ô dạng password; nút Hiện/Ẩn chỉ đổi cách hiển thị trên màn hình. Yêu cầu tra cứu gửi bằng POST, không đặt căn cước trong URL. Sau xác thực, hệ thống trả thông tin nhân viên cơ bản và các bài được phân công.
+5. Admin > Tổng quan: bấm tên môn hoặc nút Câu hỏi để xem, sửa, xóa câu hỏi của môn đó. Khi sửa, ID câu hỏi được khóa để tránh đổi nhầm tham chiếu.
+6. Admin > Môn & cài đặt > Phân quyền người được làm bài: chọn một hoặc nhiều bộ phận, phòng ban, chức vụ hoặc nhân viên cụ thể. Không có quy tắc nào nghĩa là mọi nhân viên đã xác thực đều được vào. Các quy tắc được kết hợp theo OR (đáp ứng ít nhất một quy tắc thì được vào).
+7. Bài ở trạng thái đóng, chưa đến giờ hoặc hết hạn sẽ hiển thị nhưng không chọn được. Chỉ bài đang mở mới bắt đầu được.
+
+LƯU Ý BẢO MẬT: CCCD là dữ liệu cá nhân nhạy cảm. Chỉ quản trị viên được truy cập Google Sheet; không chia sẻ sheet NhanVien công khai. Cột CCCD_Hash là HMAC có khóa bí mật trong Script Properties, không phải số căn cước gốc. Việc nhập CCCD là một bước xác thực theo mã định danh, không mạnh bằng OTP hoặc đăng nhập nhiều yếu tố; nếu cần mức bảo mật cao hơn, nên bổ sung OTP qua email/SMS trước khi phát hành chính thức.
