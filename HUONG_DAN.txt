@@ -1,59 +1,44 @@
-HỆ THỐNG THI TRỰC TUYẾN V4 - DÙNG GOOGLE SHEET ID, CÓ TRANG QUẢN TRỊ ADMIN
+HE THONG THI TRUC TUYEN V5 – GOOGLE SHEET ID
 
-CÁC TỆP
-- Code.gs: API Google Apps Script, tạo đề, chấm điểm, xác thực Admin.
-- index.html: Cổng thi cho học sinh.
-- admin.html: Trang quản trị dành cho giáo viên/Admin.
-- Mau_NganHangDe.xlsx: File Excel mẫu 10 cột để nhập ngân hàng câu hỏi.
+1. Cau hinh Code.gs
+- Mo Code.gs, thay SPREADSHEET_ID bang ID Google Sheets (phan giua /d/ va /edit).
+- Tai khoan chay/deploy Apps Script phai co quyen sua bang tinh.
 
-A. CÀI ĐẶT GOOGLE SHEETS VÀ APPS SCRIPT
-1. Tạo hoặc mở Google Sheets dùng làm cơ sở dữ liệu.
-2. Sao chép ID của bảng tính: phần nằm giữa /d/ và /edit trong URL. Ví dụ: https://docs.google.com/spreadsheets/d/ABC123xyz/edit thì ID là ABC123xyz.
-3. Mở https://script.google.com/ và tạo dự án Apps Script độc lập (không cần gắn với Sheet), hoặc mở dự án Apps Script hiện có.
-4. Thay toàn bộ nội dung Code.gs bằng Code.gs trong gói này.
-5. Ở đầu Code.gs, tìm dòng const SPREADSHEET_ID và thay giá trị DAN_ID_GOOGLE_SHEET_CUA_BAN_VAO_DAY bằng ID vừa sao chép. Chỉ thay ID, giữ nguyên dấu ngoặc kép.
-6. Lưu dự án. Tài khoản chạy/deploy Apps Script phải có quyền chỉnh sửa Google Sheets đó.
-7. Chạy setupSheets() một lần và cấp quyền. Hàm tạo/kiểm tra đúng 3 trang tính và không xóa dữ liệu đang có:
-   CaiDatDeThi: MonHoc | ThoiGianLamBai | NgayBatDau | NgayKetThuc | SoCauHoiBoc
-   NganHangDe: Id | MonHoc | LoaiCauHoi | NoiDungCauHoi | HinhAnh | DapAnA | DapAnB | DapAnC | DapAnD | DapAnDung
-   KetQua: ThoiGian | TenHocSinh | MonHoc | SoCauDung | TongSoCau | DiemSo
-8. Thiết lập mật khẩu Admin:
-   - Chọn hàm setAdminPassword trong danh sách hàm Apps Script.
-   - Trong Code.gs, thêm tạm hàm sau ở cuối file, thay mật khẩu mẫu bằng mật khẩu riêng (ít nhất 10 ký tự):
-     function taoMatKhauAdminMotLan() { setAdminPassword("MatKhauRieng_2026!"); }
-   - Chọn taoMatKhauAdminMotLan trong danh sách hàm và bấm Run. Sau khi chạy thành công, xóa hàm tạm này khỏi Code.gs và lưu lại.
-   - Mật khẩu được băm với salt ngẫu nhiên và lưu trong Script Properties, không lưu dạng rõ trong HTML.
-9. Deploy > New deployment > Web app:
-   Execute as: Me
-   Who has access: Anyone (hoặc giới hạn theo chính sách Google Workspace nếu phù hợp).
-   Bấm Deploy và sao chép URL kết thúc bằng /exec.
-10. Dán cùng URL /exec vào dòng const GAS_URL trong CẢ HAI tệp index.html và admin.html.
-11. Deploy lại khi sửa Code.gs: Deploy > Manage deployments > Edit > New version > Deploy.
+2. Cap nhat du lieu
+- Vao Apps Script, chay setupSheets() mot lan.
+- Ham nay bo sung cac cot moi vao cuoi bang CaiDatDeThi va NganHangDe, tao them sheet PhanHoi; khong xoa dong du lieu cu. Neu tieu de cu khong dung, dung lai va kiem tra thu cong.
+- Sheet CaiDatDeThi co them: CheDo (GRADED/OPINION), XaoTronCauHoi (TRUE/FALSE), XaoTronDapAn (TRUE/FALSE).
+- Sheet NganHangDe co them HinhAnhA, HinhAnhB, HinhAnhC, HinhAnhD va cac loai cau hoi moi.
 
-B. ĐƯA GIAO DIỆN LÊN GITHUB PAGES
-1. Upload index.html và admin.html lên cùng thư mục của repository GitHub Pages.
-2. Học sinh truy cập địa chỉ GitHub Pages của index.html.
-3. Giáo viên truy cập cùng tên miền + /admin.html để vào trang quản trị.
+3. Dat mat khau Admin lan dau
+- Chay setAdminPassword('MAT_KHAU_RIENG_TREN_10_KY_TU') trong Apps Script; khong luu mat khau trong source lau dai.
+- Script Properties tu tao ADMIN_SALT va ADMIN_HASH.
 
-C. SỬ DỤNG ADMIN
-- Đăng nhập bằng mật khẩu đã thiết lập ở bước A.8.
-- Môn thi & lịch thi: thêm hoặc cập nhật mã môn, số phút, ngày bắt đầu, ngày kết thúc, số câu hỏi bốc.
-- Ngân hàng câu hỏi: thêm câu hỏi trắc nghiệm hoặc điền khuyết. Câu trắc nghiệm yêu cầu đủ A/B/C/D và đáp án đúng là A/B/C/D.
-- Nhập câu hỏi Excel: copy 10 cột từ Excel, dán vào ô dữ liệu dạng tab-separated; có thể dán cả dòng tiêu đề. Id phải duy nhất.
-- Tổng quan: Mở / Đóng / Theo lịch cho từng môn. Mở sẽ cho phép vào thi ngay kể cả ngoài lịch cấu hình; Đóng khóa đề ngay. Theo lịch trả quyền kiểm soát cho NgayBatDau/NgayKetThuc.
-- Bảng điểm: lọc theo môn, hiển thị tối đa 1.000 kết quả gần nhất.
+4. Deploy
+- Deploy > New deployment > Web app; Execute as: Me; chon pham vi truy cap phu hop.
+- Copy URL /exec, dan vao GAS_URL trong ca index.html va admin.html.
+- Upload hai file HTML len cung thu muc GitHub Pages. Trang quan tri: /admin.html.
+- Moi lan sua Code.gs: Deploy > Manage deployments > Edit > New version > Deploy.
 
-D. QUY TẮC DỮ LIỆU
-- ThoiGianLamBai: 0 hoặc trống = không giới hạn.
-- NgayBatDau/NgayKetThuc: nhập trong trang quản trị theo giờ địa phương của bảng tính; để trống nếu không giới hạn đầu/cuối.
-- SoCauHoiBoc: số > 0 lấy ngẫu nhiên tối đa số câu đó; 0 = lấy tất cả câu hợp lệ.
-- LoaiCauHoi: MULTIPLE_CHOICE hoặc FILL_BLANK.
-- Điền khuyết: DapAnDung có thể chứa nhiều đáp án, cách nhau bằng dấu |. Chấm không phân biệt hoa thường, bỏ khoảng trắng thừa.
-- HinhAnh: URL ảnh công khai http/https. Ảnh không công khai sẽ không hiển thị cho học sinh.
+5. Loai cau hoi
+- MULTIPLE_CHOICE: mot dap an A/B/C/D.
+- MULTI_SELECT: nhieu dap an, vi du A,C.
+- TRUE_FALSE: A=Dung, B=Sai.
+- FILL_BLANK: dap an hoac cac dap an chap nhan cach nhau boi |.
+- ESSAY: cau tu luan; khong tu dong cham diem. Trong che do thi, cau tu luan duoc luu de giao vien cham rieng.
 
-E. LƯU Ý BẢO MẬT / GIỚI HẠN
-- API Admin yêu cầu token phiên; mật khẩu không nằm trong HTML. Token hết hạn sau tối đa 6 giờ hoặc khi cache bị làm mới.
-- Không đưa cột DapAnDung ra giao diện học sinh; đáp án được giữ ở máy chủ để chấm.
-- Đây chưa phải hệ thống chống gian lận toàn diện: chưa xác minh danh tính, chưa giới hạn một lần thi theo từng học sinh, chưa có giám sát webcam/tab hay nhật ký IP.
-- Không chia sẻ URL Apps Script và mật khẩu Admin công khai. Nên dùng mật khẩu mạnh, không dùng lại mật khẩu cá nhân.
-- Nếu đổi quyền truy cập Web App hoặc tài khoản triển khai, cần kiểm tra lại khả năng gọi API từ GitHub Pages.
+6. Hinh anh
+- Moi hinh can co URL truy cap duoc tu trinh duyet cua hoc sinh. Voi Google Drive, Share > General access > Anyone with the link > Viewer.
+- Dan link chia se Drive vao cot HinhAnh (anh cau hoi) hoac HinhAnhA-D (anh phuong an). He thong tu chuyen link Drive thong dung sang dang xem anh.
+- Neu van khong hien, mo link bang cua so an danh; neu bi yeu cau dang nhap hoac bao khong co quyen, hoc sinh cung khong xem duoc. Uu tien URL anh truc tiep HTTPS.
+
+7. Che do va xao tron
+- GRADED: cham tu dong cac cau khach quan; cau ESSAY khong tinh vao tong cau tu dong cham, can giao vien cham rieng.
+- OPINION: khong cham diem; luu tung cau tra loi vao sheet PhanHoi.
+- XaoTronCauHoi va XaoTronDapAn co the bat/tat rieng trong cau hinh mon hoc.
+
+8. Tong hop y kien
+- Admin > Tong hop y kien se gom cac cau tra loi tu luan/khảo sat co tu khoa giong nhau. Day la phan nhom heuristic Jaccard, khong phai AI hieu ngu nghia; giao vien can xem lai tung y kien goc.
+- Khong xoa hoac thay doi cau tra loi goc. Du lieu goc nam trong sheet PhanHoi.
+
+Luu y bao mat: day la he thong thi co xac thuc Admin co ban, chua phai nen tang chong gian lan. Nen dung HTTPS, mat khau manh, gioi han quyen Sheet va thu nghiem bang tai khoan hoc sinh truoc khi su dung chinh thuc.
