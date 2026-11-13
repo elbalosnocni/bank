@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phiếu Khảo Sát Địa Chỉ</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .survey-box {
+      background: #ffffff;
+      padding: 24px 32px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 450px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #1a1a1a;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+    select, input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+    select:disabled {
+      background-color: #eee;
+      cursor: not-allowed;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    button:hover {
+      background-color: #0052a3;
+    }
+  </style>
+</head>
+<body>
+
+<div class="survey-box">
+  <h2>Thông tin khu vực khảo sát</h2>
+  <form id="surveyForm">
+    <div class="form-group">
+      <label for="province">Tỉnh / Thành phố *</label>
+      <select id="province" name="province" required>
+        <option value="">Đang tải danh sách tỉnh...</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="ward">Phường / Xã / Đặc khu *</label>
+      <select id="ward" name="ward" disabled required>
+        <option value="">Vui lòng chọn Tỉnh/Thành phố trước</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="street">Số nhà, tên đường / thôn / ấp</label>
+      <input type="text" id="street" name="street" placeholder="Ví dụ: 123 Nguyễn Trãi">
+    </div>
+
+    <button type="submit">Gửi phiếu khảo sát</button>
+  </form>
+</div>
+
+<script>
+  // Sử dụng CDN từ kho GitHub sunshine-tech/VietnamProvinces
+  const DATA_URL = 'https://jsdelivr.net';
+  
+  const provinceSelect = document.getElementById('province');
+  const wardSelect = document.getElementById('ward');
+  let provincesData = [];
+
+  // 1. Tải dữ liệu từ GitHub CDN khi mở trang
+  async function loadAdminData() {
+    try {
+      const response = await fetch(DATA_URL);
+      if (!response.ok) throw new Error('Không thể tải dữ liệu');
+      provincesData = await response.json();
+
+      // Đổ danh sách Tỉnh/Thành vào thẻ select đầu tiên
+      provinceSelect.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>';
+      provincesData.forEach(prov => {
+        // Lưu tên làm value để khi gửi form nhận được chữ thay vì mã số
+        const option = new Option(prov.name, prov.name);
+        option.dataset.code = prov.code; 
+        provinceSelect.add(option);
+      });
+    } catch (error) {
+      provinceSelect.innerHTML = '<option value="">Lỗi tải dữ liệu. Vui lòng tải lại trang.</option>';
+      console.error('Lỗi:', error);
+    }
+  }
+
+  // 2. Xử lý khi người dùng chọn Tỉnh/Thành phố
+  provinceSelect.addEventListener('change', function () {
+    const selectedOption = this.options[this.selectedIndex];
+    const provCode = selectedOption.dataset.code;
+
+    // Reset ô chọn Phường/Xã
+    wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+
+    if (!provCode) {
+      wardSelect.disabled = true;
+      return;
+    }
+
+    // Tìm tỉnh được chọn trong mảng dữ liệu gốc
+    const selectedProvince = provincesData.find(p => p.code == provCode);
+
+    if (selectedProvince && selectedProvince.wards) {
+      wardSelect.disabled = false;
+      selectedProvince.wards.forEach(ward => {
+        const option = new Option(ward.name, ward.name);
+        wardSelect.add(option);
+      });
+    } else {
+      wardSelect.disabled = true;
+    }
+  });
+
+  // 3. Xử lý sự kiện gửi form (Demo)
+  document.getElementById('surveyForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = {
+      province: provinceSelect.value,
+      ward: wardSelect.value,
+      street: document.getElementById('street').value
+    };
+    alert('Dữ liệu thu thập được:\n' + JSON.stringify(formData, null, 2));
+  });
+
+  // Khởi chạy hàm tải dữ liệu
+  loadAdminData();
+</script>
+
+</body>
+</html>
