@@ -133,3 +133,25 @@ Cập nhật V8 lên V8:
 3. Giữ nguyên SPREADSHEET_ID, Script Properties và các sheet cũ.
 4. Không cần chạy setupSheets lại vì V8 dùng lại cột TruongTraLoi hiện có để lưu cấu hình bổ sung.
 5. Deploy Apps Script thành New version; cập nhật 2 file HTML trên GitHub Pages.
+
+
+=== V9: GIAO DIEN QUAN TRI, CAU HOI MO RONG VA CAU TRUC DE ===
+
+1. Giao dien Admin: tren may tinh hien thanh dieu huong ngang; tren dien thoai gom vao nut Menu. Tab dang chon co nen xanh va dong “Dang o: ...”.
+2. Tong quan: hien trang thai hien tai theo EXAM_STATUS_MAP va lich mo/ket thuc; nut dieu khien doi theo trang thai. OPEN = dang mo, CLOSED = da dong, SCHEDULED = chua den gio, EXPIRED = da het han. “Theo lich” xoa ghi de va quay lai lich.
+3. Sua mon: vao Mon & cai dat, chon mon da tao, bam Tai cau hinh. Co the sua ten, thoi gian, ngay gio, so cau, che do va xao tron. Khi doi ten mon, he thong cap nhat ten mon trong ngan hang va bang phan quyen.
+4. Phan quyen: chon mon trong muc Phan quyen; cac quy tac da luu duoc tai lai va hien thi. Cac pham vi ket hop theo OR.
+5. ID cau hoi: de trong truong ID; he thong tu sinh Q00001, Q00002... ID cu van giu nguyen khi sua.
+6. Tra loi ngan SHORT_TEXT: chon Van ban hoac Chi nhap so. Dat do dai toi da; voi CCCD 12 so, chon Chi nhap so va dat do dai toi da 12. Co the dat gioi han gia tri so. Dau vao so duoc gui dang chuoi de giu so 0 o dau (vi du dien thoai/CCCD). Backend kiem tra lai, khong chi dua vao trinh duyet.
+7. Lua chon mo rong: voi MULTIPLE_CHOICE, MULTI_SELECT, DROPDOWN va dang luoi, nhap moi lua chon tren mot dong trong Danh sach lua chon mo rong. Neu co hon 4 lua chon, he thong luu danh sach mo rong trong JSON o cot TruongTraLoi; cac cot DapAnA-D van duoc dien 4 lua chon dau de tuong thich du lieu cu. Dap an dung dung ma A, B, C...
+8. Khao sat OPINION: khong bat buoc khai bao dap an dung cho cau trac nghiem. O che do GRADED, cac cau khach quan van can dap an dung de cham.
+9. Tieu de/phan muc: chon loai SECTION, nhap tieu de, chon tieu de tu do, danh muc A/B/C hoac danh muc I/II/III. SECTION khong tinh la cau hoi, khong tinh vao so cau va khong xuat hien trong thanh tien do. Neu de co SECTION, he thong giu thu tu de tranh xao tron tieu de tach khoi cau hoi.
+10. Thanh tien do: tinh so cau da co tra loi tren tong so cau thuc te; cac SECTION khong tinh.
+11. Dropdown tinh/xa/phuong: V9 hien ho tro danh sach lua chon tu nhap trong ngan hang. De lien ket truc tiep voi du an danh muc dia ban tinh/xa/phuong can cung cap URL/API hoac ten sheet va cau truc cot cua du an dia ban; khong nen tu dong doan nguon du lieu.
+
+CAP NHAT V8/V7 LEN V9:
+- Sao luu Google Sheet.
+- Thay Code.gs, admin.html, index.html bang bo V9. Giu nguyen SPREADSHEET_ID va Script Properties.
+- Khong can chay setupSheets() lai: V9 dung lai 16 cot hien co cua NganHangDe va cac sheet hien tai.
+- Deploy Apps Script thanh New version; cap nhat 2 file HTML tren GitHub Pages.
+- Kiem tra thu bang mot mon OPINION va mot mon GRADED truoc khi dung chinh thuc.
