@@ -91,9 +91,9 @@ Luu y bao mat: day la he thong thi co xac thuc Admin co ban, chua phai nen tang 
    - Them dau * o dau dong trong cau hinh truong con neu muon bat buoc tra loi. Chon “Toi khong co y kien” se bo qua cac truong bat buoc.
 
 
-=== V7: XÁC THỰC CĂN CƯỚC VÀ PHÂN QUYỀN BÀI THI ===
+=== V8: XÁC THỰC CĂN CƯỚC VÀ PHÂN QUYỀN BÀI THI ===
 
-1. Chạy setupSheets() sau khi thay Code.gs V7. Sheet NhanVien được bổ sung cột H: CCCD_Hash (mã băm); sheet PhanQuyenDe được tạo mới. Không đổi tên cột H và không nhập số căn cước gốc trực tiếp vào cột H.
+1. Chạy setupSheets() sau khi thay Code.gs V8. Sheet NhanVien được bổ sung cột H: CCCD_Hash (mã băm); sheet PhanQuyenDe được tạo mới. Không đổi tên cột H và không nhập số căn cước gốc trực tiếp vào cột H.
 2. Trong Admin > Danh sách nhân viên, dán 8 cột theo thứ tự: MaNhanVien, HoTen, BoPhan, PhongBan, ChucVu, Email, TrangThai, CCCD_12_SO. Cột cuối là số căn cước gốc 12 chữ số để hệ thống băm ngay khi nhận; số gốc không được ghi vào Google Sheet. Nếu cập nhật nhân viên mà để trống cột CCCD thì mã băm cũ được giữ nguyên.
 3. Hệ thống tạo bí mật CCCD_HMAC_SECRET trong Script Properties. Không xóa hoặc thay đổi thuộc tính này sau khi đã nhập nhân viên; nếu thay đổi, tất cả mã băm cũ không còn khớp và phải nhập lại danh sách có số căn cước.
 4. Người tham gia nhập căn cước trong ô dạng password; nút Hiện/Ẩn chỉ đổi cách hiển thị trên màn hình. Yêu cầu tra cứu gửi bằng POST, không đặt căn cước trong URL. Sau xác thực, hệ thống trả thông tin nhân viên cơ bản và các bài được phân công.
@@ -102,3 +102,34 @@ Luu y bao mat: day la he thong thi co xac thuc Admin co ban, chua phai nen tang 
 7. Bài ở trạng thái đóng, chưa đến giờ hoặc hết hạn sẽ hiển thị nhưng không chọn được. Chỉ bài đang mở mới bắt đầu được.
 
 LƯU Ý BẢO MẬT: CCCD là dữ liệu cá nhân nhạy cảm. Chỉ quản trị viên được truy cập Google Sheet; không chia sẻ sheet NhanVien công khai. Cột CCCD_Hash là HMAC có khóa bí mật trong Script Properties, không phải số căn cước gốc. Việc nhập CCCD là một bước xác thực theo mã định danh, không mạnh bằng OTP hoặc đăng nhập nhiều yếu tố; nếu cần mức bảo mật cao hơn, nên bổ sung OTP qua email/SMS trước khi phát hành chính thức.
+
+
+PHIÊN BẢN V8 – BỔ SUNG DẠNG CÂU HỎI KIỂU GOOGLE FORMS
+
+Ngoài các dạng V8, V8 bổ sung:
+- Trả lời ngắn (SHORT_TEXT): câu trả lời dạng một dòng; có thể khai báo đáp án chấp nhận bằng dấu |.
+- Danh sách thả xuống (DROPDOWN): chọn một phương án A–D.
+- Thang đo tuyến tính (LINEAR_SCALE): thang điểm số, cấu hình điểm đầu/cuối và nhãn hai đầu.
+- Đánh giá sao (RATING): chọn từ 1 đến 5–10 sao.
+- Ngày (DATE) và Giờ (TIME): nhập theo bộ chọn ngày/giờ của trình duyệt.
+- Lưới trắc nghiệm (MULTIPLE_CHOICE_GRID): mỗi dòng chọn một cột.
+- Lưới hộp kiểm (CHECKBOX_GRID): mỗi dòng có thể chọn nhiều cột.
+
+Cấu hình trong Admin:
+- Dạng lưới: nhập các dòng ở vùng “Các dòng trong lưới”; các cột lấy từ phương án A–D. Cần tối thiểu 2 phương án.
+- Thang đo: nhập điểm bắt đầu/kết thúc và nhãn hai đầu.
+- Đánh giá sao: dùng khoảng 1 đến 5 sao mặc định; có thể tăng số sao trong cấu hình tối đa 10.
+- Dropdown: nhập phương án trong A–D.
+
+Lưu ý chấm điểm:
+- Trắc nghiệm, chọn nhiều, đúng/sai, điền khuyết, trả lời ngắn và dropdown có thể đối chiếu đáp án trong chế độ có điểm.
+- Tự luận, khảo sát nhiều nội dung, thang đo, đánh giá sao, ngày/giờ và câu hỏi dạng lưới được lưu để giáo viên xem/xử lý; không tự động chấm điểm ở phiên bản này.
+- Các dạng lưới hiện lưu toàn bộ lựa chọn theo từng dòng dưới dạng một câu trả lời JSON. Nên dùng chế độ khảo sát nếu cần phân tích ý kiến.
+- Một số giới hạn: Dropdown/lưới dùng tối đa 4 cột phương án A–D trong giao diện hiện tại. Chưa có tải tệp lên, chia trang/section, logic chuyển trang theo câu trả lời, giới hạn số câu trả lời, hoặc xác thực email tự động như Google Forms.
+
+Cập nhật V8 lên V8:
+1. Sao lưu Google Sheet.
+2. Thay Code.gs, index.html, admin.html bằng bộ V8.
+3. Giữ nguyên SPREADSHEET_ID, Script Properties và các sheet cũ.
+4. Không cần chạy setupSheets lại vì V8 dùng lại cột TruongTraLoi hiện có để lưu cấu hình bổ sung.
+5. Deploy Apps Script thành New version; cập nhật 2 file HTML trên GitHub Pages.
