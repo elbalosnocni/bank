@@ -1,157 +1,53 @@
-HE THONG THI TRUC TUYEN V6 – GOOGLE SHEET ID
+HE THONG THI TRUC TUYEN / KHAO SAT V10
 
-1. Cau hinh Code.gs
-- Mo Code.gs, thay SPREADSHEET_ID bang ID Google Sheets (phan giua /d/ va /edit).
-- Tai khoan chay/deploy Apps Script phai co quyen sua bang tinh.
+1. CAC FILE
+- Code.gs: backend Google Apps Script.
+- index.html: giao dien nhan vien/nguoi lam bai.
+- admin.html: giao dien quan tri.
+- index-tinhxaphuong.html: file tham khao ban dau do nguoi dung cung cap; khong can upload rieng vao GitHub Pages.
 
-2. Cap nhat du lieu
-- Vao Apps Script, chay setupSheets() mot lan.
-- Ham nay bo sung cac cot moi vao cuoi bang CaiDatDeThi va NganHangDe, tao them sheet PhanHoi; khong xoa dong du lieu cu. Neu tieu de cu khong dung, dung lai va kiem tra thu cong.
-- Sheet CaiDatDeThi co them: CheDo (GRADED/OPINION), XaoTronCauHoi (TRUE/FALSE), XaoTronDapAn (TRUE/FALSE).
-- Sheet NganHangDe co them HinhAnhA, HinhAnhB, HinhAnhC, HinhAnhD va cac loai cau hoi moi.
+2. CAP NHAT TU V9 LEN V10
+- Sao luu Google Sheet va cac file GitHub hien tai.
+- Thay Code.gs bang ban V10; giu nguyen SPREADSHEET_ID va cac Script Properties dang dung.
+- Trong Apps Script, chay setupSheets() mot lan de bo sung cot FormDescription (cot I) trong CaiDatDeThi. Ham setupSheets khong xoa dong du lieu.
+- Cap nhat index.html va admin.html V10 len GitHub Pages.
+- Deploy > Manage deployments > Edit > New version > Deploy.
+- Kiem tra GAS_URL trong ca hai file HTML va thay bang URL /exec dang dung.
 
-3. Dat mat khau Admin lan dau
-- Chay setAdminPassword('MAT_KHAU_RIENG_TREN_10_KY_TU') trong Apps Script; khong luu mat khau trong source lau dai.
-- Script Properties tu tao ADMIN_SALT va ADMIN_HASH.
+3. MO TA FORM VA CAU HOI
+- Admin > Mon & cai dat: truong Form description luu vao cot I FormDescription cua CaiDatDeThi.
+- Admin > Ngan hang cau hoi: Question description duoc luu trong JSON cau hinh o cot TruongTraLoi (cot P), khong them cot moi.
+- Voi loai SECTION, Question description duoc hien thi nhu Section Description (optional).
+- Cau hoi moi mac dinh duoc danh dau bat buoc. Bo chon “Bat buoc tra loi (*)” neu muon cau hoi tuy chon.
+- Truong con MULTI_FIELD van co the danh dau bat buoc bang dau * o dau dong. “Toi khong co y kien” bo qua cac truong con.
+- Cac cau hoi V9 cu khong co metadata required se mac dinh khong bat buoc, de tranh bat buoc nham cac cau cu.
 
-4. Deploy
-- Deploy > New deployment > Web app; Execute as: Me; chon pham vi truy cap phu hop.
-- Copy URL /exec, dan vao GAS_URL trong ca index.html va admin.html.
-- Upload hai file HTML len cung thu muc GitHub Pages. Trang quan tri: /admin.html.
-- Moi lan sua Code.gs: Deploy > Manage deployments > Edit > New version > Deploy.
+4. KIEM TRA LOI VA GUI BAI
+- Trang nguoi lam bai giu lai toan bo cau tra loi khi co loi.
+- Khi bam Gui bai, giao dien kiem tra cau bat buoc va dinh dang SHORT_TEXT (chi so, do dai, min/max), danh dau cac cau loi va cuon den cau loi dau tien.
+- Backend kiem tra lai va tra ve danh sach loi theo ID cau hoi; giao dien khong xoa noi dung bai lam khi server tu choi.
+- Khi khong con loi, nguoi lam bai xac nhan ket thuc. Sau khi gui thanh cong, trang hien thi ket qua/diem va thong ke tung cau tra loi.
+- Thanh tien do co dinh ben duoi tieu de mon thi/khao sat; SECTION khong tinh vao tong so cau.
 
-5. Loai cau hoi
-- MULTIPLE_CHOICE: mot dap an A/B/C/D.
-- MULTI_SELECT: nhieu dap an, vi du A,C.
-- TRUE_FALSE: A=Dung, B=Sai.
-- FILL_BLANK: dap an hoac cac dap an chap nhan cach nhau boi |.
-- ESSAY: cau tu luan; khong tu dong cham diem. Trong che do thi, cau tu luan duoc luu de giao vien cham rieng.
+5. DROPDOWN TINH / XA-PHUONG
+- Trong Admin, chon loai DROPDOWN va “Tinh / Thanh pho -> Xa / Phuong (du lieu VietnamProvinces)”.
+- Giao dien se tai JSON nested-divisions, hien danh sach tinh/thanh pho; khi chon tinh se nap cac xa/phuong tu thuoc tinh wards.
+- Luu ten va ma tinh, ten va ma xa/phuong trong PhanHoi.
+- Nguon CDN duoc dat trong index.html tai bien GEO_DATA_URL. Neu nha cung cap doi duong dan/branch, can cap nhat bien nay.
+- File index-tinhxaphuong.html goc co DATA_URL='https://jsdelivr.net', day khong phai URL JSON nen khong dung truc tiep duoc. Cau truc ma file goc mong doi (province.name/code/wards) phu hop voi dang nested data cua VietnamProvinces, nhung URL can phai tro den file JSON cu the.
+- Du lieu cua sunshine-tech/VietnamProvinces mo ta don vi hanh chinh cap tinh va xa/phuong sau sap xep thang 7/2025. README repo hien ghi data version 2026-02-21; can doi chieu lai neu co thay doi hanh chinh moi hon.
 
-6. Hinh anh
-- Moi hinh can co URL truy cap duoc tu trinh duyet cua hoc sinh. Voi Google Drive, Share > General access > Anyone with the link > Viewer.
-- Dan link chia se Drive vao cot HinhAnh (anh cau hoi) hoac HinhAnhA-D (anh phuong an). He thong tu chuyen link Drive thong dung sang dang xem anh.
-- Neu van khong hien, mo link bang cua so an danh; neu bi yeu cau dang nhap hoac bao khong co quyen, hoc sinh cung khong xem duoc. Uu tien URL anh truc tiep HTTPS.
+6. DASHBOARD BAO CAO ADMIN
+- Tab Bao cao hien thi so luot nop, tong phan hoi, diem trung binh, luot nop theo mon/bo phan va 20 luot nop gan nhat.
+- Tab Bang diem van xem chi tiet ket qua thi.
+- Tab Tong hop y kien tiep tuc nhom cau tra loi tuong tu dua tren token/Jaccard; day la nhom tu khoa tham khao, khong phai AI doc hieu ngu nghia. Nen doc lai noi dung goc truoc khi ket luan.
 
-7. Che do va xao tron
-- GRADED: cham tu dong cac cau khach quan; cau ESSAY khong tinh vao tong cau tu dong cham, can giao vien cham rieng.
-- OPINION: khong cham diem; luu tung cau tra loi vao sheet PhanHoi.
-- XaoTronCauHoi va XaoTronDapAn co the bat/tat rieng trong cau hinh mon hoc.
+7. CAC LUU Y KY THUAT
+- V10 khong doi cau truc 16 cot cua NganHangDe; description, required va geoType duoc luu trong JSON o cot TruongTraLoi.
+- V10 them cot I FormDescription trong CaiDatDeThi. Chay setupSheets() mot lan sau khi cap nhat Code.gs.
+- Khong thay SPREADSHEET_ID bang gia tri mau. Khong thay mat khau Admin hoac CCCD_HMAC_SECRET trong Script Properties.
+- Kiem thu it nhat: 1 mon OPINION, 1 mon GRADED, cau SHORT_TEXT so, cau bat buoc bo trong, cau khong bat buoc, MULTI_FIELD co dau *, SECTION, dropdown tinh/xa-phuong va dashboard.
 
-8. Tong hop y kien
-- Admin > Tong hop y kien se gom cac cau tra loi tu luan/khảo sat co tu khoa giong nhau. Day la phan nhom heuristic Jaccard, khong phai AI hieu ngu nghia; giao vien can xem lai tung y kien goc.
-- Khong xoa hoac thay doi cau tra loi goc. Du lieu goc nam trong sheet PhanHoi.
-
-Luu y bao mat: day la he thong thi co xac thuc Admin co ban, chua phai nen tang chong gian lan. Nen dung HTTPS, mat khau manh, gioi han quyen Sheet va thu nghiem bang tai khoan hoc sinh truoc khi su dung chinh thuc.
-
-
-=== V6: DANH BA NHAN VIEN VA PHAN LOAI Y KIEN ===
-
-1. Sau khi thay Code.gs V6, giu nguyen SPREADSHEET_ID cua ban va chay setupSheets() mot lan.
-   Ham nay bo sung cac cot moi vao cuoi cac sheet cu va tao sheet NhanVien; khong xoa cac dong du lieu cu.
-
-2. Sheet NhanVien co 7 cot theo dung thu tu:
-   MaNhanVien | HoTen | BoPhan | PhongBan | ChucVu | Email | TrangThai
-   - MaNhanVien: ma duy nhat, bat buoc.
-   - HoTen: ho ten hien thi, bat buoc.
-   - BoPhan, PhongBan, ChucVu: dung de phan loai va loc bao cao.
-   - Email: tuy chon, khong duoc cong khai trong tra cuu.
-   - TrangThai: de trong hoac ACTIVE de hien trong danh sach; INACTIVE de an khoi tra cuu.
-
-3. Co the nap danh sach nhan vien bang mot trong hai cach:
-   - Dan truc tiep du lieu vao sheet NhanVien, bat dau tu dong 2; hoac
-   - Vao Admin > Danh sach nhan vien, dan du lieu copy tu Excel theo thu tu 7 cot va bam Nhap/cap nhat.
-   Neu MaNhanVien da ton tai, he thong cap nhat dong do; neu chua co, he thong them moi.
-
-4. Khi sheet NhanVien co du lieu, trang hoc sinh yeu cau nhap it nhat 2 ky tu va chon mot nhan vien trong danh sach goi y. He thong lay ten, ma, bo phan, phong ban, chuc vu tu Google Sheet, khong tin du lieu don vi do trinh duyet gui len.
-   Neu sheet NhanVien chua co dong du lieu, he thong tam cho phep nhap ho ten thu cong.
-
-5. Phan loai cau hoi:
-   - Them cot PhanLoai (cot thu 15) trong NganHangDe.
-   - Khi them cau hoi trong Admin, nhap nhom/chu de, vi du: Tien luong, Phuc loi, Dieu kien lam viec, An toan lao dong.
-   - Khi nhap ngan hang tu Excel, them cot thu 15 PhanLoai sau cot DapAnDung.
-   - Phan loai nay duoc luu cung cau tra loi trong sheet PhanHoi.
-
-6. Admin > Tong hop y kien co the loc theo Mon thi/khao sat, Bo phan, Phong ban, Chuc vu, Ma nhan vien va Phan loai. Cac nhom y kien tuong tu chi gom trong cung mot phan loai; noi dung goc duoc giu lai.
-
-7. Bao mat du lieu nhan vien:
-   - Chi dua vao sheet nhung truong can thiet cho viec xac dinh nguoi tra loi va tong hop.
-   - Khong dua so CCCD, tai khoan ngan hang, dia chi nha hoac thong tin nhay cam vao sheet nay.
-   - Danh sach nhan vien duoc tra cuu tu trang hoc sinh; khong them Email vao ket qua tra cuu. Bao ve Google Sheet va chi chia se cho nguoi co tham quyen.
-
-8. Sau khi cap nhat Code.gs, vao Deploy > Manage deployments > Edit > New version > Deploy. Cap nhat index.html va admin.html V6 len GitHub Pages. URL GAS_URL va SPREADSHEET_ID tiep tuc dung gia tri cua ban.
-
-9. Cau hoi khao sat nhieu noi dung (MULTI_FIELD):
-   - Trong Admin > Ngan hang cau hoi, chon loai “Khao sat nhieu noi dung”.
-   - Moi dong trong o “Cac truong tra loi” la mot muc, vi du: Y kien de xuat; Giai phap thuc hien de xuat; Hieu qua/Ket qua mong doi.
-   - Nguoi tham gia nhap rieng tung muc hoac chon “Toi khong co y kien”.
-   - Cac cau tra loi duoc luu tach theo ten truong trong PhanHoi; Admin co the loc theo truong de tong hop cac y kien cung noi dung.
-   - Loai cau hoi nay khong tu dong tinh diem.
-   - Khi nhap Excel, cot 16 TruongTraLoi nhap cac muc cach nhau bang dau |.
-
-   - Them dau * o dau dong trong cau hinh truong con neu muon bat buoc tra loi. Chon “Toi khong co y kien” se bo qua cac truong bat buoc.
-
-
-=== V8: XÁC THỰC CĂN CƯỚC VÀ PHÂN QUYỀN BÀI THI ===
-
-1. Chạy setupSheets() sau khi thay Code.gs V8. Sheet NhanVien được bổ sung cột H: CCCD_Hash (mã băm); sheet PhanQuyenDe được tạo mới. Không đổi tên cột H và không nhập số căn cước gốc trực tiếp vào cột H.
-2. Trong Admin > Danh sách nhân viên, dán 8 cột theo thứ tự: MaNhanVien, HoTen, BoPhan, PhongBan, ChucVu, Email, TrangThai, CCCD_12_SO. Cột cuối là số căn cước gốc 12 chữ số để hệ thống băm ngay khi nhận; số gốc không được ghi vào Google Sheet. Nếu cập nhật nhân viên mà để trống cột CCCD thì mã băm cũ được giữ nguyên.
-3. Hệ thống tạo bí mật CCCD_HMAC_SECRET trong Script Properties. Không xóa hoặc thay đổi thuộc tính này sau khi đã nhập nhân viên; nếu thay đổi, tất cả mã băm cũ không còn khớp và phải nhập lại danh sách có số căn cước.
-4. Người tham gia nhập căn cước trong ô dạng password; nút Hiện/Ẩn chỉ đổi cách hiển thị trên màn hình. Yêu cầu tra cứu gửi bằng POST, không đặt căn cước trong URL. Sau xác thực, hệ thống trả thông tin nhân viên cơ bản và các bài được phân công.
-5. Admin > Tổng quan: bấm tên môn hoặc nút Câu hỏi để xem, sửa, xóa câu hỏi của môn đó. Khi sửa, ID câu hỏi được khóa để tránh đổi nhầm tham chiếu.
-6. Admin > Môn & cài đặt > Phân quyền người được làm bài: chọn một hoặc nhiều bộ phận, phòng ban, chức vụ hoặc nhân viên cụ thể. Không có quy tắc nào nghĩa là mọi nhân viên đã xác thực đều được vào. Các quy tắc được kết hợp theo OR (đáp ứng ít nhất một quy tắc thì được vào).
-7. Bài ở trạng thái đóng, chưa đến giờ hoặc hết hạn sẽ hiển thị nhưng không chọn được. Chỉ bài đang mở mới bắt đầu được.
-
-LƯU Ý BẢO MẬT: CCCD là dữ liệu cá nhân nhạy cảm. Chỉ quản trị viên được truy cập Google Sheet; không chia sẻ sheet NhanVien công khai. Cột CCCD_Hash là HMAC có khóa bí mật trong Script Properties, không phải số căn cước gốc. Việc nhập CCCD là một bước xác thực theo mã định danh, không mạnh bằng OTP hoặc đăng nhập nhiều yếu tố; nếu cần mức bảo mật cao hơn, nên bổ sung OTP qua email/SMS trước khi phát hành chính thức.
-
-
-PHIÊN BẢN V8 – BỔ SUNG DẠNG CÂU HỎI KIỂU GOOGLE FORMS
-
-Ngoài các dạng V8, V8 bổ sung:
-- Trả lời ngắn (SHORT_TEXT): câu trả lời dạng một dòng; có thể khai báo đáp án chấp nhận bằng dấu |.
-- Danh sách thả xuống (DROPDOWN): chọn một phương án A–D.
-- Thang đo tuyến tính (LINEAR_SCALE): thang điểm số, cấu hình điểm đầu/cuối và nhãn hai đầu.
-- Đánh giá sao (RATING): chọn từ 1 đến 5–10 sao.
-- Ngày (DATE) và Giờ (TIME): nhập theo bộ chọn ngày/giờ của trình duyệt.
-- Lưới trắc nghiệm (MULTIPLE_CHOICE_GRID): mỗi dòng chọn một cột.
-- Lưới hộp kiểm (CHECKBOX_GRID): mỗi dòng có thể chọn nhiều cột.
-
-Cấu hình trong Admin:
-- Dạng lưới: nhập các dòng ở vùng “Các dòng trong lưới”; các cột lấy từ phương án A–D. Cần tối thiểu 2 phương án.
-- Thang đo: nhập điểm bắt đầu/kết thúc và nhãn hai đầu.
-- Đánh giá sao: dùng khoảng 1 đến 5 sao mặc định; có thể tăng số sao trong cấu hình tối đa 10.
-- Dropdown: nhập phương án trong A–D.
-
-Lưu ý chấm điểm:
-- Trắc nghiệm, chọn nhiều, đúng/sai, điền khuyết, trả lời ngắn và dropdown có thể đối chiếu đáp án trong chế độ có điểm.
-- Tự luận, khảo sát nhiều nội dung, thang đo, đánh giá sao, ngày/giờ và câu hỏi dạng lưới được lưu để giáo viên xem/xử lý; không tự động chấm điểm ở phiên bản này.
-- Các dạng lưới hiện lưu toàn bộ lựa chọn theo từng dòng dưới dạng một câu trả lời JSON. Nên dùng chế độ khảo sát nếu cần phân tích ý kiến.
-- Một số giới hạn: Dropdown/lưới dùng tối đa 4 cột phương án A–D trong giao diện hiện tại. Chưa có tải tệp lên, chia trang/section, logic chuyển trang theo câu trả lời, giới hạn số câu trả lời, hoặc xác thực email tự động như Google Forms.
-
-Cập nhật V8 lên V8:
-1. Sao lưu Google Sheet.
-2. Thay Code.gs, index.html, admin.html bằng bộ V8.
-3. Giữ nguyên SPREADSHEET_ID, Script Properties và các sheet cũ.
-4. Không cần chạy setupSheets lại vì V8 dùng lại cột TruongTraLoi hiện có để lưu cấu hình bổ sung.
-5. Deploy Apps Script thành New version; cập nhật 2 file HTML trên GitHub Pages.
-
-
-=== V9: GIAO DIEN QUAN TRI, CAU HOI MO RONG VA CAU TRUC DE ===
-
-1. Giao dien Admin: tren may tinh hien thanh dieu huong ngang; tren dien thoai gom vao nut Menu. Tab dang chon co nen xanh va dong “Dang o: ...”.
-2. Tong quan: hien trang thai hien tai theo EXAM_STATUS_MAP va lich mo/ket thuc; nut dieu khien doi theo trang thai. OPEN = dang mo, CLOSED = da dong, SCHEDULED = chua den gio, EXPIRED = da het han. “Theo lich” xoa ghi de va quay lai lich.
-3. Sua mon: vao Mon & cai dat, chon mon da tao, bam Tai cau hinh. Co the sua ten, thoi gian, ngay gio, so cau, che do va xao tron. Khi doi ten mon, he thong cap nhat ten mon trong ngan hang va bang phan quyen.
-4. Phan quyen: chon mon trong muc Phan quyen; cac quy tac da luu duoc tai lai va hien thi. Cac pham vi ket hop theo OR.
-5. ID cau hoi: de trong truong ID; he thong tu sinh Q00001, Q00002... ID cu van giu nguyen khi sua.
-6. Tra loi ngan SHORT_TEXT: chon Van ban hoac Chi nhap so. Dat do dai toi da; voi CCCD 12 so, chon Chi nhap so va dat do dai toi da 12. Co the dat gioi han gia tri so. Dau vao so duoc gui dang chuoi de giu so 0 o dau (vi du dien thoai/CCCD). Backend kiem tra lai, khong chi dua vao trinh duyet.
-7. Lua chon mo rong: voi MULTIPLE_CHOICE, MULTI_SELECT, DROPDOWN va dang luoi, nhap moi lua chon tren mot dong trong Danh sach lua chon mo rong. Neu co hon 4 lua chon, he thong luu danh sach mo rong trong JSON o cot TruongTraLoi; cac cot DapAnA-D van duoc dien 4 lua chon dau de tuong thich du lieu cu. Dap an dung dung ma A, B, C...
-8. Khao sat OPINION: khong bat buoc khai bao dap an dung cho cau trac nghiem. O che do GRADED, cac cau khach quan van can dap an dung de cham.
-9. Tieu de/phan muc: chon loai SECTION, nhap tieu de, chon tieu de tu do, danh muc A/B/C hoac danh muc I/II/III. SECTION khong tinh la cau hoi, khong tinh vao so cau va khong xuat hien trong thanh tien do. Neu de co SECTION, he thong giu thu tu de tranh xao tron tieu de tach khoi cau hoi.
-10. Thanh tien do: tinh so cau da co tra loi tren tong so cau thuc te; cac SECTION khong tinh.
-11. Dropdown tinh/xa/phuong: V9 hien ho tro danh sach lua chon tu nhap trong ngan hang. De lien ket truc tiep voi du an danh muc dia ban tinh/xa/phuong can cung cap URL/API hoac ten sheet va cau truc cot cua du an dia ban; khong nen tu dong doan nguon du lieu.
-
-CAP NHAT V8/V7 LEN V9:
-- Sao luu Google Sheet.
-- Thay Code.gs, admin.html, index.html bang bo V9. Giu nguyen SPREADSHEET_ID va Script Properties.
-- Khong can chay setupSheets() lai: V9 dung lai 16 cot hien co cua NganHangDe va cac sheet hien tai.
-- Deploy Apps Script thanh New version; cap nhat 2 file HTML tren GitHub Pages.
-- Kiem tra thu bang mot mon OPINION va mot mon GRADED truoc khi dung chinh thuc.
+8. PHAM VI KIEM THU
+- Da kiem tra cu phap JavaScript bang node --check cho Code.gs va cac script trong index.html/admin.html.
+- Chua the kiem thu truc tiep voi Google Apps Script, Google Sheet thuc te hoac trinh duyet GitHub Pages cua ban trong moi truong nay. Can chay checklist muc 7 truoc khi su dung chinh thuc.
